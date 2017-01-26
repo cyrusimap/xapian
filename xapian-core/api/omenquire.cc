@@ -325,11 +325,12 @@ MSet::snippet(const string & text,
 	      unsigned flags,
 	      const string & hi_start,
 	      const string & hi_end,
-	      const string & omit) const
+	      const string & omit,
+	      unsigned cjk_flags) const
 {
     Assert(internal.get() != 0);
     return internal->snippet(text, length, stemmer, flags,
-			     hi_start, hi_end, omit);
+			     hi_start, hi_end, omit, cjk_flags);
 }
 
 Xapian::doccount

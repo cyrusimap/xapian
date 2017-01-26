@@ -267,6 +267,7 @@ AC_SUBST([abi_affecting_cxxflags])
 
 XAPIAN_LDFLAGS=
 XAPIAN_LIBS=
+
 AC_SUBST([XAPIAN_LDFLAGS])
 AC_SUBST([XAPIAN_LIBS])
 
@@ -747,6 +748,12 @@ case $ac_cv_func_snprintf in
        [Define to the name of a function implementing snprintf but not caring about ISO C99 return value semantics (if one exists)])
     ;;
 esac
+
+dnl Check for ICU. We require this for CJK word tokenisation.
+PKG_CHECK_MODULES([ICU], [icu-uc])
+AC_SUBST([ICU_CFLAGS])
+AC_SUBST([ICU_LIBS])
+
 
 dnl ***************************
 dnl * Select modules to build *

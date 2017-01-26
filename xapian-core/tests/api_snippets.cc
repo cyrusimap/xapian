@@ -33,8 +33,6 @@
 #include "testsuite.h"
 #include "testutils.h"
 
-#include <iostream>
-
 using namespace std;
 
 struct snippet_testcase {
@@ -310,6 +308,24 @@ DEFINE_TESTCASE(snippet_empty, backend) {
     flags |= Xapian::MSet::SNIPPET_EMPTY_WITHOUT_MATCH;
     TEST_STRINGS_EQUAL(mset.snippet(input, len, stem, flags),
 		       "A <b>rubbish</b> <b>example</b> text");
+
+    return true;
+}
+
+DEFINE_TESTCASE(snippet_cjkwords, backend) {
+
+    Xapian::Enquire enquire(get_database("apitest_simpledata"));
+    enquire.set_query(Xapian::Query("已經"));
+
+    Xapian::MSet mset = enquire.get_mset(0, 0);
+
+    Xapian::Stem stem;
+    const char *input = "明末時已經有香港地方的概念";
+    size_t len = strlen(input);
+
+    unsigned cjk_flags = Xapian::TermGenerator::FLAG_CJK_WORDS;
+    TEST_STRINGS_EQUAL(mset.snippet(input, len, stem, 0, "<b>", "</b>", "...", cjk_flags),
+		       "明末時<b>已經</b>有香港地方的概念");
 
     return true;
 }

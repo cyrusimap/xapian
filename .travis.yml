@@ -29,6 +29,8 @@ matrix:
             - libmagic-dev
             - tcl
             - libsvm-dev
+            - libicu-dev
+            - pkg-config
     - compiler: clang
       os: linux
       # Clang is already installed, but we want to build using the
@@ -49,6 +51,8 @@ matrix:
             - tcl
             - libsvm-dev
             - libc++-dev
+            - libicu-dev
+            - pkg-config
       # We also have to disable an error, because (older?)
       # perl header files don't play nicely with clang.
       env: USE_CC=clang USE_CXX='clang++ -stdlib=libc++' CXXFLAGS=-Wno-error=reserved-user-defined-literal
@@ -58,12 +62,12 @@ matrix:
         # Work-around crash in doxygen 1.8.13 XML backend:
         # https://github.com/xapian/xapian/pull/132
         - brew install doxygen --HEAD
-        - brew install help2man graphviz pngcrush libmagic pcre libsvm lua mono python3
+        - brew install help2man graphviz pngcrush libmagic pcre libsvm lua mono python3 icu4c
         - pip install sphinx docutils
         - pip3 install sphinx
         - mkdir -p /tmp/xapian-libsvm-fixed-include
         - ln -sF "`ls -1d /usr/local/Cellar/libsvm/3.*/include|tail -n 1`" /tmp/xapian-libsvm-fixed-include/libsvm
-      env: CXXFLAGS=-Wno-error=reserved-user-defined-literal CPPFLAGS=-I/tmp/xapian-libsvm-fixed-include confargs=--prefix=/Users/travis/XapianInstall installcore='make -C xapian-core install'
+      env: CXXFLAGS=-Wno-error=reserved-user-defined-literal CPPFLAGS='-I/tmp/xapian-libsvm-fixed-include -I/usr/local/opt/icu4c/include' LDFLAGS=-L/usr/local/opt/icu4c/lib PKG_CONFIG_PATH=/usr/local/opt/icu4c/lib/pkgconfig confargs=--prefix=/Users/travis/XapianInstall installcore='make -C xapian-core install'
     - os: linux
       # (Ab)use env to label this build:
       env: dummy="Automated run of xapian-check-patch"
@@ -74,7 +78,6 @@ matrix:
       # * otherwise, master
       script:
         - git diff `[ "$TRAVIS_PULL_REQUEST" = false ] && echo master || echo "$TRAVIS_BRANCH"`...|xapian-maintainer-tools/xapian-check-patch
-
 
 before_script:
   # Bootstrap everything (including letor, which isn't done
