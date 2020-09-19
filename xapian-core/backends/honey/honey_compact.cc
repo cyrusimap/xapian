@@ -627,13 +627,17 @@ merge_postlists(Xapian::Compactor* compactor,
     priority_queue<cursor_type*, vector<cursor_type*>, gt_type> pq;
     for ( ; b != e; ++b, ++offset) {
 	auto in = *b;
-	auto cursor = new cursor_type(in, *offset);
-	if (cursor->next()) {
-	    pq.push(cursor);
-	} else {
+	if (in->empty()) {
+	    delete in;
 	    // Skip empty tables.
-	    delete cursor;
-	}
+	} else {
+	    auto cursor = new cursor_type(in, *offset);
+	    if (cursor->next()) {
+	        pq.push(cursor);
+	    } else {
+	        delete cursor;
+	    }
+        }
     }
 
     string last_key;
